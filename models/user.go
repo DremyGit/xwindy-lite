@@ -2,8 +2,7 @@ package models
 
 // User 用户表模型
 type User struct {
-	Sno       string `orm:"size(10)"`
-	Username  string `orm:"size(16)"`
+	Sno       string `orm:"size(10);pk"`
 	Nickname  string `orm:"size(32)"`
 	Password  string `orm:"size(32)"`
 	Phone     string `orm:"size(11)"`
@@ -11,12 +10,22 @@ type User struct {
 	AvatarURL string `orm:"size(50)"`
 }
 
-func (u *User) GetBySno(sno string) (user *User, err error) {
-
-	err = o.QueryTable("user").Filter("sno", sno).One(user)
+func (user *User) GetBySno(sno string) error {
+	err := o.QueryTable("user").Filter("sno", sno).One(user)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return user, nil
+	return nil
+}
 
+func (user *User) Create() error {
+	_, err := o.Insert(&User{
+		Sno:      user.Sno,
+		Password: user.Password,
+		Phone:    user.Phone,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

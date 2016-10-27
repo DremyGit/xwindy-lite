@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/toolbox"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -35,7 +36,7 @@ func init() {
 	}
 
 	user := iniconf.String("database::user")
-	pass := iniconf.String("database::pass")
+	pass := iniconf.String("database::password")
 	db := iniconf.String("database::database")
 	orm.RegisterDataBase("default", "mysql",
 		user+":"+pass+"@/"+db+"?charset=utf8&loc=Asia%2FShanghai")
