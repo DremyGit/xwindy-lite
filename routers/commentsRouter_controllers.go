@@ -9,7 +9,7 @@ func init() {
 	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"],
 		beego.ControllerComments{
 			Method: "GetBySno",
-			Router: `/:userId`,
+			Router: `/:sno`,
 			AllowHTTPMethods: []string{"get"},
 			Params: nil})
 
@@ -18,6 +18,20 @@ func init() {
 			Method: "CreateUser",
 			Router: `/`,
 			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "UpdateInfo",
+			Router: `/:sno`,
+			AllowHTTPMethods: []string{"put"},
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "ResetPassword",
+			Router: `/:sno/password`,
+			AllowHTTPMethods: []string{"put"},
 			Params: nil})
 
 }
