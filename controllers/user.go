@@ -129,14 +129,19 @@ func (c *UserController) ResetPassword() {
 
 	var userDB models.User
 	sno := c.Ctx.Input.Param(":sno")
-	oldPassword := payload["old_password"].(string)
+	oldPassword, ok := payload["old_password"].(string)
+	if !ok || len(oldPassword) == 0 {
+		c.Failure(400, "密码不能为空")
+		return
+	}
+
 	if err := userDB.GetBySnoAndPassword(sno, oldPassword); err != nil {
 		c.Failure(404, "旧密码错误")
 		return
 	}
 
-	newPassword := payload["new_password"].(string)
-	if len(newPassword) == 0 {
+	newPassword, ok := payload["new_password"].(string)
+	if !ok || len(newPassword) == 0 {
 		c.Failure(400, "新密码不能为空")
 		return
 	}

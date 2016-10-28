@@ -84,6 +84,7 @@ func (user *User) UpdateBy(payload map[string]interface{}) error {
 }
 
 func (user *User) UpdatePassword(password string) error {
+	user.Password = password
 	if _, err := o.Update(user, "password"); err != nil {
 		return err
 	}
