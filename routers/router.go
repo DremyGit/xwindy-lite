@@ -19,6 +19,11 @@ func init() {
 				&controllers.UserController{},
 			),
 		),
+		beego.NSNamespace("/news",
+			beego.NSInclude(
+				&controllers.NewsController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

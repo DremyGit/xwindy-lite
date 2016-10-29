@@ -40,7 +40,10 @@ func init() {
 	db := iniconf.String("database::database")
 	orm.RegisterDataBase("default", "mysql",
 		user+":"+pass+"@/"+db+"?charset=utf8&loc=Asia%2FShanghai")
+
 	orm.RegisterModel(new(User))
+	orm.RegisterModel(new(News))
+
 	orm.RunSyncdb("default", false, true)
 
 	if beego.BConfig.RunMode == "dev" {

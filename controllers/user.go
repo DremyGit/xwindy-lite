@@ -16,7 +16,7 @@ type UserController struct {
 
 // GetBySno get user info by sno
 // @Title GetBySno
-// @Description GetBySno (need Admin)
+// @Description GetBySno
 // @Param sno path string true 学号
 // @Param access_token query string false access_token
 // @Success 200 {object} models.UserInfo
