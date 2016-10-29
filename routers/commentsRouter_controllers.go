@@ -34,4 +34,11 @@ func init() {
 			AllowHTTPMethods: []string{"put"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "Authorize",
+			Router: `/authorization`,
+			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
 }

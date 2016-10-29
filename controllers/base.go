@@ -8,6 +8,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/toolbox"
 	. "github.com/bitly/go-simplejson"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 type BaseController struct {
@@ -52,4 +53,18 @@ func (c *BaseController) Failure(code int, message interface{}) {
 	toolbox.StatisticsMap.AddStatistics(c.Ctx.Input.Method(), c.Ctx.Input.URL(), "&MyController", time.Since(requestBegin))
 	c.Ctx.Output.SetStatus(code)
 	c.ServeJSON()
+}
+
+func (c *BaseController) ParseToken() (map[string]interface{}, error) {
+	token, err := jwt.ParseFromRequest(c.Ctx.Request, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte("test"), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return token.Claims, nil
 }

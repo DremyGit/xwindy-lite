@@ -2,6 +2,7 @@ package controllers
 
 import (
 	. "github.com/bitly/go-simplejson"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/copier"
 
 	"github.com/dremygit/xwindy-lite/models"
@@ -17,6 +18,7 @@ type UserController struct {
 // @Title GetBySno
 // @Description GetBySno (need Admin)
 // @Param sno path string true 学号
+// @Param access_token query string false access_token
 // @Success 200 {object} models.UserInfo
 // @Failure 400 Request Error
 // @Failure 403 Forbidden
@@ -25,6 +27,18 @@ type UserController struct {
 func (c *UserController) GetBySno() {
 
 	sno := c.Ctx.Input.Param(":sno")
+
+	token, err := c.ParseToken()
+	if err != nil {
+		c.Failure(401, err.Error())
+		return
+	}
+	tokenSno, ok := token["sno"].(string)
+	if !ok || tokenSno != sno {
+		c.Failure(403, "拒绝访问")
+		return
+	}
+
 	var userDB models.User
 	if err := userDB.GetBySno(sno); err != nil {
 		c.Failure(404, "用户不存在")
@@ -88,6 +102,18 @@ func (c *UserController) UpdateInfo() {
 	// var payload models.UpdateUserPayload
 
 	sno := c.Ctx.Input.Param(":sno")
+
+	token, err := c.ParseToken()
+	if err != nil {
+		c.Failure(401, err.Error())
+		return
+	}
+	tokenSno, ok := token["sno"].(string)
+	if !ok || tokenSno != sno {
+		c.Failure(403, "拒绝访问")
+		return
+	}
+
 	var userDB models.User
 	if err := userDB.GetBySno(sno); err != nil {
 		c.Failure(404, "用户不存在")
@@ -135,6 +161,17 @@ func (c *UserController) ResetPassword() {
 		return
 	}
 
+	token, err := c.ParseToken()
+	if err != nil {
+		c.Failure(401, err.Error())
+		return
+	}
+	tokenSno, ok := token["sno"].(string)
+	if !ok || tokenSno != sno {
+		c.Failure(403, "拒绝访问")
+		return
+	}
+
 	if err := userDB.GetBySnoAndPassword(sno, oldPassword); err != nil {
 		c.Failure(404, "旧密码错误")
 		return
@@ -152,4 +189,48 @@ func (c *UserController) ResetPassword() {
 	}
 
 	c.Success(201, true)
+}
+
+// Authorization
+// @Title Authorization
+// @Description Authorization
+// @Param body body models.AuthorizationPayload true Body
+// @router /authorization [post]
+func (c *UserController) Authorize() {
+	payload, err := c.ParsePayload()
+	if err != nil {
+		c.Failure(400, err.Error())
+		return
+	}
+
+	sno, ok := payload["sno"].(string)
+	if !ok || len(sno) == 0 {
+		c.Failure(400, "学号不能为空")
+		return
+	}
+
+	password, ok := payload["password"].(string)
+	if !ok || len(password) == 0 {
+		c.Failure(400, "密码不能为空")
+		return
+	}
+
+	var userDB models.User
+
+	if err := userDB.GetBySnoAndPassword(sno, password); err != nil {
+		c.Failure(404, "用户名或密码错误")
+		return
+	}
+
+	token := jwt.New(jwt.SigningMethodHS256)
+	token.Claims["sno"] = sno
+	tokenString, err := token.SignedString([]byte("test"))
+	if err != nil {
+		c.Failure(500, err.Error())
+		return
+	}
+
+	c.Success(201, map[string]string{
+		"token": tokenString,
+	})
 }

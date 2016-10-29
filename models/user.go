@@ -43,6 +43,11 @@ type ResetPasswordPayload struct {
 	EASPassword string `json:"eas_password"`
 }
 
+type AuthorizationPayload struct {
+	Sno      string `json:"sno"`
+	Password string `json:"password"`
+}
+
 func (user *User) GetBySno(sno string) error {
 	err := o.QueryTable("user").Filter("sno", sno).One(user)
 	if err != nil {
