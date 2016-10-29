@@ -43,6 +43,7 @@ func init() {
 
 	orm.RegisterModel(new(User))
 	orm.RegisterModel(new(News))
+	orm.RegisterModel(new(Comment))
 
 	orm.RunSyncdb("default", false, true)
 

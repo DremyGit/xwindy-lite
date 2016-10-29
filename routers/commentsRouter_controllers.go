@@ -6,6 +6,20 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:CommentController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:CommentController"],
+		beego.ControllerComments{
+			Method: "GetCommentListByNewsID",
+			Router: `/:newsid/comments`,
+			AllowHTTPMethods: []string{"get"},
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:CommentController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:CommentController"],
+		beego.ControllerComments{
+			Method: "CreateComment",
+			Router: `/:newsid/comments`,
+			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:NewsController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:NewsController"],
 		beego.ControllerComments{
 			Method: "GetNewsList",

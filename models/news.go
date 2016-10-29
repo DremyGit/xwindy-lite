@@ -8,7 +8,7 @@ import (
 type News struct {
 	ID           int       `json:"id"               orm:"size(6);column(id);pk;auto"`
 	Title        string    `json:"title"            orm:"size(255)"`
-	Time         time.Time `json:"time"`
+	Time         time.Time `json:"time"             orm:"auto_now_add"`
 	Summary      string    `json:"summary"          orm:"size(255)"`
 	Content      string    `json:"content"          orm:"size(255);type(text)"`
 	SourceURL    string    `json:"source_url"       orm:"size(255);column(source_url)"`
