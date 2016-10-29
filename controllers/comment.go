@@ -44,7 +44,7 @@ func (c *CommentController) GetCommentListByNewsID() {
 // @Description Create comment to the news
 // @Param newsid path int true "News ID"
 // @Param body body models.CommentPayload true body
-// @Success 200 {object} models.CommentResource
+// @Success 201 {object} models.CommentResource
 // @router /:newsid/comments [post]
 func (c *CommentController) CreateComment() {
 	newsID, error := strconv.Atoi(c.Ctx.Input.Param(":newsid"))
