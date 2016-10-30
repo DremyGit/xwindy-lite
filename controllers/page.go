@@ -15,12 +15,14 @@ func (c *BaseController) ParsePagination() *models.Pagination {
 
 	if page, err = strconv.Atoi(c.Ctx.Input.Query("page")); err != nil {
 		page = 1
-		perPage = 0
 	}
-	perPage, _ = strconv.Atoi(c.Ctx.Input.Query("per_page"))
-	pagination := models.NewPagination(page, perPage)
 
-	return pagination
+	perPage, _ = strconv.Atoi(c.Ctx.Input.Query("per_page"))
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	return models.NewPagination(page, perPage)
 }
 
 type link struct {
@@ -62,6 +64,10 @@ func (c *BaseController) SuccessWithPagination(code int, data interface{}, p *mo
 		linkLast.Href = baseURL + "?" + p.ToQueryString(p.GetPageCount())
 		linkLast.Rel = "last"
 		links = append(links, linkLast.ToString())
+	}
+
+	if p.Page > p.GetPageCount() {
+		links = []string{""}
 	}
 
 	c.Ctx.Output.Header("X-Total-Count", strconv.Itoa(p.TotalCount))
