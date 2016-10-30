@@ -58,3 +58,24 @@ func (c *NewsController) GetNewsByID() {
 	copier.Copy(&news, &newsDB)
 	c.Success(200, news)
 }
+
+// @Title IncreaseClickCount
+// @Description Increase lick count
+// @Param newsid path int true "News ID"
+// @Success 204 null
+// @router /:newsid/click_count [put]
+func (c *NewsController) IncreaseClickCount() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":newsid"))
+	if err != nil {
+		c.Failure(400, "ID 错误")
+		return
+	}
+
+	newsDB := models.News{ID: id}
+	err = newsDB.IncreaseClickCount()
+	if err != nil {
+		c.Failure(500, err.Error())
+		return
+	}
+	c.Success(204, nil)
+}

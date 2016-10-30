@@ -62,10 +62,18 @@ func (comment *Comment) Create(newsID int, sno, content string) error {
 	comment.User = &user
 	comment.Content = content
 
+	o.Begin()
 	if _, err := o.Insert(comment); err != nil {
+		o.Rollback()
 		return err
 	}
 
+	if err := news.UpdateCommentCount(); err != nil {
+		o.Rollback()
+		return err
+	}
+
+	o.Commit()
 	o.QueryTable("comment").Filter("id", comment.ID).RelatedSel("user").One(comment)
 	return nil
 }

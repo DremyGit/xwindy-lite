@@ -34,6 +34,13 @@ func init() {
 			AllowHTTPMethods: []string{"get"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:NewsController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:NewsController"],
+		beego.ControllerComments{
+			Method: "IncreaseClickCount",
+			Router: `/:newsid/click_count`,
+			AllowHTTPMethods: []string{"put"},
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/dremygit/xwindy-lite/controllers:UserController"],
 		beego.ControllerComments{
 			Method: "GetBySno",

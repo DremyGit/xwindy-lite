@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/astaxie/beego/orm"
 )
 
 // News 新闻表模型
@@ -54,4 +56,19 @@ func (news *News) GetByID(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (news *News) UpdateCommentCount() error {
+	sql := "UPDATE news SET comment_count = (" +
+		"SELECT COUNT(0) FROM comment WHERE news_id = ?" +
+		") WHERE id = ?"
+	_, err := o.Raw(sql, news.ID, news.ID).Exec()
+	return err
+}
+
+func (news *News) IncreaseClickCount() error {
+	_, err := o.QueryTable("news").Filter("id", news.ID).Update(orm.Params{
+		"click_count": orm.ColValue(orm.ColAdd, 1),
+	})
+	return err
 }
