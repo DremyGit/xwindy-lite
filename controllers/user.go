@@ -14,7 +14,7 @@ type UserController struct {
 	BaseController
 }
 
-// GetBySno get user info by sno
+// GetBySno to get user info by sno
 // @Title GetBySno
 // @Description GetBySno
 // @Param sno path string true 学号
@@ -92,7 +92,7 @@ func (c *UserController) CreateUser() {
 	c.Success(201, userInfo)
 }
 
-// UpdateInfo update user info
+// UpdateInfo to update user info
 // @Title UpdateUserInfo
 // @Description Update user info
 // @Param sno path string true 学号
@@ -139,7 +139,7 @@ func (c *UserController) UpdateInfo() {
 	c.Success(201, userInfo)
 }
 
-// ResetPassword reset user's password
+// ResetPassword to reset user's password
 // @Title ResetPassword
 // @Description Reset user's password
 // @Param sno path string true 学号
@@ -191,7 +191,7 @@ func (c *UserController) ResetPassword() {
 	c.Success(201, true)
 }
 
-// Authorization
+// Authorize the login info and response token
 // @Title Authorization
 // @Description Authorization
 // @Param body body models.AuthorizationPayload true Body

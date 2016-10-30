@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
+// NewsController handle the request of news
 type NewsController struct {
 	BaseController
 }
@@ -33,7 +34,7 @@ func (c *NewsController) GetNewsList() {
 	c.SuccessWithPagination(200, newsList, p)
 }
 
-// GetNewsByID Get news by id
+// GetNewsByID to get the news by id
 // @Title GetNewsByID
 // @Description GetNewsByID
 // @Param newsid path int true "News ID"
@@ -59,6 +60,7 @@ func (c *NewsController) GetNewsByID() {
 	c.Success(200, news)
 }
 
+// IncreaseClickCount to increase click count
 // @Title IncreaseClickCount
 // @Description Increase lick count
 // @Param newsid path int true "News ID"

@@ -8,6 +8,7 @@ import (
 	"github.com/dremygit/xwindy-lite/models"
 )
 
+// ParsePagination to parse pagination params in query string
 func (c *BaseController) ParsePagination() *models.Pagination {
 	var err error
 	var page, perPage int
@@ -31,6 +32,7 @@ func (l link) ToString() string {
 	return "<" + l.Href + ">; rel=\"" + l.Rel + "\""
 }
 
+// SuccessWithPagination set the pagination info to the header and response data
 func (c *BaseController) SuccessWithPagination(code int, data interface{}, p *models.Pagination) {
 
 	var linkFirst, linkPrev, linkNext, linkLast link

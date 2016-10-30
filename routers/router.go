@@ -21,8 +21,8 @@ func init() {
 		),
 		beego.NSNamespace("/news",
 			beego.NSInclude(
-				&controllers.NewsController{},
 				&controllers.CommentController{},
+				&controllers.NewsController{},
 			),
 		),
 	)

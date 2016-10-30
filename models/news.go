@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-// News 新闻表模型
+// News is database model
 type News struct {
 	ID           int       `json:"id"               orm:"size(6);column(id);pk;auto"`
 	Title        string    `json:"title"            orm:"size(255)"`
@@ -18,6 +18,7 @@ type News struct {
 	CommentCount int       `json:"comment_count"    orm:"size(6)"`
 }
 
+// NewsListResource is the resource of news list
 type NewsListResource struct {
 	ID           int       `json:"id"`
 	Title        string    `json:"title"`
@@ -28,6 +29,7 @@ type NewsListResource struct {
 	CommentCount int       `json:"comment_count"`
 }
 
+// NewsDetailResource is the resource of news detail
 type NewsDetailResource struct {
 	ID           int       `json:"id"`
 	Title        string    `json:"title"`
@@ -38,6 +40,7 @@ type NewsDetailResource struct {
 	CommentCount int       `json:"comment_count"`
 }
 
+// GetNewsList to get news list
 func GetNewsList(p *Pagination) ([]*News, int64, error) {
 	var news []*News
 	total, err := o.QueryTable("news").Limit(p.PerPage, p.Offset).All(&news)
@@ -50,6 +53,7 @@ func GetNewsList(p *Pagination) ([]*News, int64, error) {
 	return news, total, nil
 }
 
+// GetByID to get news by id
 func (news *News) GetByID(id int) error {
 	news.ID = id
 	if err := o.Read(news); err != nil {
@@ -58,6 +62,7 @@ func (news *News) GetByID(id int) error {
 	return nil
 }
 
+// UpdateCommentCount to update comment_count in news table to match the comment count
 func (news *News) UpdateCommentCount() error {
 	sql := "UPDATE news SET comment_count = (" +
 		"SELECT COUNT(0) FROM comment WHERE news_id = ?" +
@@ -66,6 +71,7 @@ func (news *News) UpdateCommentCount() error {
 	return err
 }
 
+// IncreaseClickCount to increase click_count of the news
 func (news *News) IncreaseClickCount() error {
 	_, err := o.QueryTable("news").Filter("id", news.ID).Update(orm.Params{
 		"click_count": orm.ColValue(orm.ColAdd, 1),

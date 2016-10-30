@@ -8,11 +8,12 @@ import (
 	"github.com/dremygit/xwindy-lite/models"
 )
 
+// CommentController handle the request of comment
 type CommentController struct {
 	BaseController
 }
 
-// GetCommentListByNewsID get comment list by news id
+// GetCommentListByNewsID to get comment list by news id
 // @Title GetCommentListByNewsID
 // @Description GetCommentListByNewsID
 // @Param newsid path int true "News ID"
@@ -43,7 +44,7 @@ func (c *CommentController) GetCommentListByNewsID() {
 	c.SuccessWithPagination(200, comments, p)
 }
 
-// CreateComment create comment to the news
+// CreateComment to create comment to the news
 // @Title CreateComment
 // @Description Create comment to the news
 // @Param newsid path int true "News ID"

@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
+// Comment is Database model
 type Comment struct {
 	ID      int       `json:"id"      orm:"size(6);column(id);pk;auto"`
 	News    *News     `json:"news_id" orm:"rel(fk)"`
@@ -14,6 +15,7 @@ type Comment struct {
 	Content string    `json:"content" orm:"type(text)"`
 }
 
+// CommentResource is the resource of comment
 type CommentResource struct {
 	ID      int       `json:"id"`
 	NewsID  int       `json:"news_id"`
@@ -22,10 +24,12 @@ type CommentResource struct {
 	Content string    `json:"content"`
 }
 
+// CommentPayload is the request payload
 type CommentPayload struct {
 	Content string `json:"content"`
 }
 
+// ToResource change Comment to CommentResource
 func (comment Comment) ToResource() *CommentResource {
 	var resource CommentResource
 	copier.Copy(&resource, &comment)
@@ -34,6 +38,7 @@ func (comment Comment) ToResource() *CommentResource {
 	return &resource
 }
 
+// GetCommentListByNewsID get comment list by news ID
 func GetCommentListByNewsID(newsID int, p *Pagination) ([]*Comment, error) {
 	var comments []*Comment
 	_, err := o.QueryTable("comment").
@@ -51,6 +56,7 @@ func GetCommentListByNewsID(newsID int, p *Pagination) ([]*Comment, error) {
 	return comments, nil
 }
 
+// Create create comment in database
 func (comment *Comment) Create(newsID int, sno, content string) error {
 	var news News
 	var user User
