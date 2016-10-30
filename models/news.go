@@ -16,6 +16,7 @@ type News struct {
 	SourceURL    string    `json:"source_url"       orm:"size(255);column(source_url)"`
 	ClickCount   int       `json:"click_count"      orm:"size(6)"`
 	CommentCount int       `json:"comment_count"    orm:"size(6)"`
+	Date         time.Time `json:"date"             orm:"type(date)"`
 }
 
 // NewsListResource is the resource of news list
@@ -62,6 +63,12 @@ func (news *News) GetByID(id int) error {
 	return nil
 }
 
+// Create news
+func (news *News) Create() error {
+	_, err := o.Insert(news)
+	return err
+}
+
 // UpdateCommentCount to update comment_count in news table to match the comment count
 func (news *News) UpdateCommentCount() error {
 	sql := "UPDATE news SET comment_count = (" +
@@ -77,4 +84,13 @@ func (news *News) IncreaseClickCount() error {
 		"click_count": orm.ColValue(orm.ColAdd, 1),
 	})
 	return err
+}
+
+// IsNewsExisted lookup the repeat news
+func (news *News) IsNewsExisted() (bool, error) {
+	count, err := o.QueryTable("news").Filter("title", news.Title).Filter("date", news.Date).Count()
+	if err != nil {
+		return false, err
+	}
+	return count != 0, nil
 }
