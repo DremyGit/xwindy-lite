@@ -34,12 +34,20 @@ func (comment Comment) ToResource() *CommentResource {
 	return &resource
 }
 
-func GetCommentListByNewsID(newsID int) ([]*Comment, error) {
+func GetCommentListByNewsID(newsID int, p *Pagination) ([]*Comment, error) {
 	var comments []*Comment
-	_, err := o.QueryTable("comment").Filter("news_id", newsID).RelatedSel("user").All(&comments)
+	_, err := o.QueryTable("comment").
+		Filter("news_id", newsID).
+		RelatedSel("user").
+		Limit(p.PerPage, p.Offset).
+		All(&comments)
 	if err != nil {
 		return nil, err
 	}
+
+	totalCount, _ := o.QueryTable("comment").Filter("news_id", newsID).Count()
+	p.TotalCount = int(totalCount)
+
 	return comments, nil
 }
 

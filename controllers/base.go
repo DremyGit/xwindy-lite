@@ -6,9 +6,14 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/toolbox"
 	. "github.com/bitly/go-simplejson"
 	jwt "github.com/dgrijalva/jwt-go"
+)
+
+var (
+	API_BASE string
 )
 
 type BaseController struct {
@@ -42,7 +47,7 @@ func (c *BaseController) ParsePayload() (map[string]interface{}, error) {
 
 func (c *BaseController) Success(code int, data interface{}) {
 	c.Data["json"] = data
-	toolbox.StatisticsMap.AddStatistics(c.Ctx.Input.Method(), c.Ctx.Input.URL(), "&MyController", time.Since(requestBegin))
+	toolbox.StatisticsMap.AddStatistics(c.Ctx.Input.Method(), c.Ctx.Input.URL(), "&BaseController", time.Since(requestBegin))
 	c.Ctx.Output.SetStatus(code)
 	c.ServeJSON()
 }
@@ -50,7 +55,7 @@ func (c *BaseController) Success(code int, data interface{}) {
 func (c *BaseController) Failure(code int, message interface{}) {
 	fmt.Printf("[Err] - %s Request [%s]\t %s\t IP:%s\t %d: %s\n", time.Now().Format("2006-01-02 15:04:05"), c.Ctx.Input.Method(), c.Ctx.Input.URL(), c.Ctx.Input.IP(), code, message)
 	c.Data["json"] = &ErrorResponse{code, message}
-	toolbox.StatisticsMap.AddStatistics(c.Ctx.Input.Method(), c.Ctx.Input.URL(), "&MyController", time.Since(requestBegin))
+	toolbox.StatisticsMap.AddStatistics(c.Ctx.Input.Method(), c.Ctx.Input.URL(), "&BaseController", time.Since(requestBegin))
 	c.Ctx.Output.SetStatus(code)
 	c.ServeJSON()
 }
@@ -67,4 +72,13 @@ func (c *BaseController) ParseToken() (map[string]interface{}, error) {
 	}
 
 	return token.Claims, nil
+}
+
+func init() {
+	iniconf, err := config.NewConfig("ini", "./conf/app.conf")
+	if err != nil {
+		panic("Config file not found")
+	}
+
+	API_BASE = iniconf.String("path::hostname") + iniconf.String("path::basepath")
 }

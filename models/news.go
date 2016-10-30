@@ -36,12 +36,15 @@ type NewsDetailResource struct {
 	CommentCount int       `json:"comment_count"`
 }
 
-func GetAllNews() ([]*News, int64, error) {
+func GetNewsList(p *Pagination) ([]*News, int64, error) {
 	var news []*News
-	total, err := o.QueryTable("news").All(&news)
+	total, err := o.QueryTable("news").Limit(p.PerPage, p.Offset).All(&news)
 	if err != nil {
 		return nil, 0, err
 	}
+
+	totalCount, _ := o.QueryTable("news").Count()
+	p.TotalCount = int(totalCount)
 	return news, total, nil
 }
 

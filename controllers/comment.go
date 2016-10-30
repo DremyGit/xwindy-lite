@@ -16,6 +16,8 @@ type CommentController struct {
 // @Title GetCommentListByNewsID
 // @Description GetCommentListByNewsID
 // @Param newsid path int true "News ID"
+// @Param page query int false "Page Number"
+// @Param per_page query int false "Per Page"
 // @Success 200 {object} []models.CommentResource
 // @router /:newsid/comments [get]
 func (c *CommentController) GetCommentListByNewsID() {
@@ -26,17 +28,19 @@ func (c *CommentController) GetCommentListByNewsID() {
 		return
 	}
 
-	commentDBList, err := models.GetCommentListByNewsID(newsID)
+	p := c.ParsePagination()
+
+	commentDBList, err := models.GetCommentListByNewsID(newsID, p)
 	if err != nil {
 		c.Failure(500, err.Error())
 		return
 	}
 
-	var comments []*models.CommentResource
+	comments := []*models.CommentResource{}
 	for _, commentDB := range commentDBList {
 		comments = append(comments, commentDB.ToResource())
 	}
-	c.Success(200, comments)
+	c.SuccessWithPagination(200, comments, p)
 }
 
 // CreateComment create comment to the news

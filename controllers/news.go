@@ -15,21 +15,22 @@ type NewsController struct {
 // @Title GetNewsList
 // @Description GetNewsList
 // @Success 200 {object} []models.NewsListResource
+// @Param page query int false "Page Number"
+// @Param per_page query int false "Per Page"
 // @router / [get]
 func (c *NewsController) GetNewsList() {
-	newsDBList, _, err := models.GetAllNews()
+
+	p := c.ParsePagination()
+	newsDBList, _, err := models.GetNewsList(p)
 	if err != nil {
 		c.Failure(500, err.Error())
 		return
 	}
 
-	var newsList []*models.NewsListResource
+	newsList := []*models.NewsListResource{}
 	copier.Copy(&newsList, &newsDBList)
 
-	if newsList == nil {
-		newsList = []*models.NewsListResource{}
-	}
-	c.Success(200, newsList)
+	c.SuccessWithPagination(200, newsList, p)
 }
 
 // GetNewsByID Get news by id
