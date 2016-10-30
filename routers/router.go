@@ -1,10 +1,10 @@
 // @APIVersion 1.0.0
-// @Title beego Test API
-// @Description beego has a very cool tools to autogenerate documents for your API
-// @Contact astaxie@gmail.com
-// @TermsOfServiceUrl http://beego.me/
-// @License Apache 2.0
-// @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
+// @Title xwindy-lite API
+// @Description xwindy-lite is a mini community of news of students
+// @Contact fhgsm123@gmail.com
+// @TermsOfServiceUrl http://api.xwindy.com/
+// @License GPL v3.0
+// @LicenseUrl https://github.com/DremyGit/xwindy-lite/blob/master/LICENSE
 package routers
 
 import (
