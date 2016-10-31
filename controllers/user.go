@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"github.com/astaxie/beego/config"
 	. "github.com/bitly/go-simplejson"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/copier"
+
+	"net/http"
+	"net/url"
 
 	"github.com/dremygit/xwindy-lite/models"
 	"github.com/dremygit/xwindy-lite/utils"
@@ -155,32 +159,57 @@ func (c *UserController) ResetPassword() {
 
 	var userDB models.User
 	sno := c.Ctx.Input.Param(":sno")
-	oldPassword, ok := payload["old_password"].(string)
-	if !ok || len(oldPassword) == 0 {
-		c.Failure(400, "密码不能为空")
-		return
-	}
-
-	token, err := c.ParseToken()
-	if err != nil {
-		c.Failure(401, err.Error())
-		return
-	}
-	tokenSno, ok := token["sno"].(string)
-	if !ok || tokenSno != sno {
-		c.Failure(403, "拒绝访问")
-		return
-	}
-
-	if err := userDB.GetBySnoAndPassword(sno, oldPassword); err != nil {
-		c.Failure(404, "旧密码错误")
-		return
-	}
 
 	newPassword, ok := payload["new_password"].(string)
 	if !ok || len(newPassword) == 0 {
 		c.Failure(400, "新密码不能为空")
 		return
+	}
+
+	token, err := c.ParseToken()
+	if err != nil {
+
+		if err := userDB.GetBySno(sno); err != nil {
+			c.Failure(404, "此用户不存在")
+			return
+		}
+
+		easPassword, ok := payload["eas_password"].(string)
+		if !ok || len(easPassword) == 0 {
+			c.Failure(400, "教务系统密码不能为空")
+			return
+		}
+
+		checked, err := checkEASAccount(sno, easPassword)
+		if err != nil {
+			c.Failure(500, "教务系统连接错误")
+			return
+		}
+
+		if !checked {
+			c.Failure(403, "教务系统验证失败")
+			return
+		}
+
+	} else {
+
+		oldPassword, ok := payload["old_password"].(string)
+		if !ok || len(oldPassword) == 0 {
+			c.Failure(400, "旧密码不能为空")
+			return
+		}
+
+		tokenSno, ok := token["sno"].(string)
+		if !ok || tokenSno != sno {
+			c.Failure(403, "拒绝访问")
+			return
+		}
+
+		if err := userDB.GetBySnoAndPassword(sno, oldPassword); err != nil {
+			c.Failure(404, "旧密码错误")
+			return
+		}
+
 	}
 
 	if err := userDB.UpdatePassword(newPassword); err != nil {
@@ -197,6 +226,7 @@ func (c *UserController) ResetPassword() {
 // @Param body body models.AuthorizationPayload true Body
 // @router /authorization [post]
 func (c *UserController) Authorize() {
+
 	payload, err := c.ParsePayload()
 	if err != nil {
 		c.Failure(400, err.Error())
@@ -233,4 +263,43 @@ func (c *UserController) Authorize() {
 	c.Success(201, map[string]string{
 		"token": tokenString,
 	})
+}
+
+var easHost string
+
+func checkEASAccount(sno, password string) (bool, error) {
+
+	form := url.Values{
+		"UserStyle": []string{"student"},
+		"user":      []string{sno},
+		"password":  []string{password},
+	}
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	req, err := client.PostForm(easHost+"/pass.asp", form)
+	defer req.Body.Close()
+	if err != nil {
+		return false, err
+	}
+
+	if req.StatusCode == 302 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func init() {
+
+	iniconf, err := config.NewConfig("ini", "./conf/app.conf")
+	if err != nil {
+		panic("Config file not found")
+	}
+
+	easHost = iniconf.String("app::eashost")
 }
